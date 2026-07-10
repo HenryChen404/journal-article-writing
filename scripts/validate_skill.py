@@ -83,6 +83,7 @@ def main() -> int:
         "templates/okf-claim.md",
         "templates/okf-material.md",
         "templates/okf-section.md",
+        "templates/okf-decision.md",
         "templates/fact-check-ledger.csv",
         "scripts/audit_article.py",
         "scripts/init_story_project.py",
