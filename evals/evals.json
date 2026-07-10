@@ -3,20 +3,26 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "I want to write a 2,500-word reported feature on how default AI meeting transcription is changing what employees say at work. Build the deep-research plan, a provisional story hypothesis, an evidence matrix, and an article outline. Do not draft the article yet.",
-      "expected_output": "A scoped development-impact-reaction hypothesis; six-box research plan; source-role map; contradiction search plan; evidence matrix; missing-evidence list; and a functional lead/nut-graf/body/ending outline.",
+      "prompt": "I want to write a 2,500-word reported feature on how default AI meeting transcription is changing what employees say at work. Build the workflow, but stop for my confirmation at the story maturity, hypothesis, architecture, and section-pattern gates. Do not draft before I approve.",
+      "expected_output": "A prefilled brief; 2–3 candidate story models; explicit AskUserQuestion gates; an OKF six-box research plan; and no premature draft.",
       "files": []
     },
     {
       "id": 2,
-      "prompt": "I have notes from 12 interviews, a policy PDF, survey results, and three scenes, but my story about return-to-office rules feels like a generic trend piece. Show me how to narrow the angle, decide which material belongs in each section, and identify what reporting is still missing.",
-      "expected_output": "Competing hypotheses, a chosen scope boundary, material classification, section cards, counterevidence and fairness gaps, and a targeted follow-up reporting list.",
+      "prompt": "I have 12 interview notes, one policy PDF, survey data, and three scenes about return-to-office rules. Organize the material with stable source, claim, material, and section IDs; then propose a directory that tells me what every part does and how it expands.",
+      "expected_output": "OKF-style SRC/CLM/MAT/SEC records, evidence boxes, material placement, section jobs, expansion patterns, and a G3/G4 confirmation.",
       "files": []
     },
     {
       "id": 3,
-      "prompt": "Review my long-form article draft as a demanding feature editor. Check the lead, nut graf, evidence, causal claims, characters, data, transitions, ending, fairness, and fact-check readiness. Give me a three-pass revision plan rather than merely rewriting sentences.",
-      "expected_output": "A substance-first editorial diagnosis, structural revision map, prose pass, fact-check risks, unresolved claims, and prioritized next actions.",
+      "prompt": "Review this feature draft. First flag reporting and structure problems. Then make the language less AI-sounding while preserving every verified fact and quotation. Use my attached writing sample as the voice reference.",
+      "expected_output": "Substance-first review, structure review, voice profile, anti-AI audit, preserved facts/quotes, and a final G6 risk summary.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Create a section plan for a reaction-led story. For each section choose one expansion tool and one sentence/rhythm tool, explain when it should be used, and ask me to approve the choices.",
+      "expected_output": "Reaction-led directory, EXP tool cards, STY tool selections, failure modes, and an AskUserQuestion approval gate.",
       "files": []
     }
   ]

@@ -1,1 +1,1 @@
-claim_id,article_location,exact_claim,claim_type,source_1,source_2,verification_status,dispute_or_uncertainty,owner,required_action
+claim_id,section_id,article_location,exact_claim,claim_type,material_ids,source_ids,source_roles,verification_status,confidence,dispute_or_uncertainty,request_for_comment,owner,required_action
