@@ -1,326 +1,392 @@
 ---
 name: journal-article-writing
-description: Research, plan, write, fact-check, or revise a journalistic feature article, profile, explanatory story, reported essay, interview-based story, or narrative nonfiction piece. Use this skill whenever the user asks for deep research that will become an article, wants to turn a broad topic or source packet into a story, needs a story hypothesis or angle, asks how to structure leads/nut grafs/body sections/quotes/data/endings, or wants a rigorous editorial review. Do not treat academic journal papers as the default meaning of "journal article."
-allowed-tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch, WebFetch
+description: Research, shape, outline, write, fact-check, or revise a journalistic feature, profile, explanatory story, reported essay, interview-based story, or narrative nonfiction piece. Use this skill whenever a user wants deep research to become an article, needs help turning a broad topic or source packet into a story, wants a story hypothesis or angle, needs an evidence/material system, asks how to design sections or write leads/nut grafs/body sections/quotes/data/endings, or wants rigorous editorial review. Actively use AskUserQuestion at the editorial decision gates defined below. Do not treat academic journal papers as the default meaning of "journal article."
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - WebSearch
+  - WebFetch
+  - AskUserQuestion
 ---
 
 # Journal Article Writing
 
-Turn a broad subject into a researched, evidence-backed, readable journalistic article.
+Turn a broad subject into a researched, evidence-backed, human-sounding journalistic article.
 
-Apply the workflow progressively. Produce only the artifacts needed for the user's current stage, but preserve enough structure that later stages can continue without restarting.
+Apply the workflow progressively. Produce only the artifacts needed for the user's current stage, but preserve the evidence and design state so later stages can continue without restarting.
 
-## Core operating model
+## Non-negotiable operating principles
 
-Treat reporting and writing as one feedback loop:
+1. Treat reporting and writing as one feedback loop.
+2. Treat the story hypothesis as a testable working model, not a conclusion to defend.
+3. Build the article from traceable source, claim, material, and section records.
+4. Never invent interviews, quotations, scenes, sensory detail, chronology, motives, or internal thoughts.
+5. Do not use polish to hide missing reporting.
+6. Stop and involve the user at high-leverage editorial decisions.
+7. Revise from evidence to structure to sentences, in that order.
+8. Use the user's language and voice. Preserve quotation language unless translation is requested and label translations.
 
-```text
-topic
-→ map the change
-→ form a working story hypothesis
-→ research and interview against it
-→ revise the hypothesis
-→ organize evidence
-→ draft
-→ verify
-→ revise from substance to sentences
+## Required human decision gates
+
+Use `AskUserQuestion` at these gates. Present 2–4 concrete options, state your recommendation and why, and wait for confirmation before crossing the gate.
+
+If `AskUserQuestion` is unavailable, ask the same concise question in chat and wait. Do not silently choose unless the user explicitly delegated that decision.
+
+| Gate | Confirm with the user | Required output before asking |
+|---|---|---|
+| G0 Assignment | audience, article type, target length, deliverable, voice sample availability | prefilled editorial brief |
+| G1 Story maturity | development, impact, reaction, or profile; human center | 2–3 candidate story models |
+| G2 Story hypothesis | central change, impact, conflict, scope boundary | recommended hypothesis plus alternatives |
+| G3 Article architecture | logical line, chronology, thematic profile, or hybrid; section directory | article blueprint with section jobs |
+| G4 Section expansion | how each major section unfolds | expansion pattern selected for each section |
+| G5 Draft voice | publication voice or user voice; humanizer strength | short voice profile and sample paragraph |
+| G6 Final sign-off | unresolved facts, fairness risks, and material exclusions | verification and revision report |
+
+Batch related decisions into one question when possible. Do not interrupt the user for low-level wording choices.
+
+Read [references/human-checkpoints.md](references/human-checkpoints.md) before running a full end-to-end assignment.
+
+## Project workspace
+
+For a full assignment, create a story workspace using:
+
+```bash
+python scripts/init_story_project.py "Working title" --output .
 ```
 
-Never use polish to hide missing reporting.
-
-## 1. Establish the assignment
-
-Extract or infer:
-
-- topic and intended audience;
-- article type: feature, profile, explanatory, investigation, reported essay, or narrative;
-- target length, language, tone, deadline, and publication context;
-- available source material and access to interviews;
-- whether the user wants research, an outline, a draft, a critique, or the full workflow.
-
-Write in the user's requested language. Preserve the original language of quotations unless translation is requested; label translations.
-
-For a full workflow, create a working directory with:
+The workspace follows an OKF v0.1-compatible knowledge bundle:
 
 ```text
-research-dossier.md
-story-hypothesis.md
-article-outline.md
-draft.md
-fact-check-ledger.csv
-revision-report.md
+story-slug/
+├── index.md
+├── editorial-brief.md
+├── story-design-sop.md
+├── research-dossier.md
+├── article-blueprint.md
+├── sources/
+├── claims/
+├── materials/
+├── sections/
+├── drafts/
+└── audits/
 ```
 
-Use the bundled templates rather than inventing new schemas.
+Use stable IDs:
 
-## 2. Build the story hypothesis before deep research
+```text
+SRC-001   source
+CLM-001   claim
+MAT-001   usable material
+SEC-001   article section
+DEC-001   human editorial decision
+```
 
-A story hypothesis is a revisable reporting instruction, not a thesis to defend.
+Read [references/okf-material-system.md](references/okf-material-system.md) before creating or reorganizing source notes.
 
-Identify:
+## Workflow
 
-1. **Central development** — who is doing what differently from before?
-2. **Story maturity** — is the story mainly at development, impact, or reaction?
-3. **Most important impact** — what concrete consequence matters most?
-4. **Reaction** — who is adapting, resisting, exploiting, regulating, or reversing it?
-5. **Human center** — who acts or bears the consequence?
-6. **Conflict** — which goals, interests, institutions, constraints, or values collide?
-7. **Scope boundary** — what this article will not attempt to cover.
+### 1. Establish the assignment and prefill the form
 
-Use one of these provisional forms:
+Create `editorial-brief.md` from [templates/editorial-brief.md](templates/editorial-brief.md).
+
+Prefill everything inferable from the user's request and supplied files. Do not make the user fill fields you already know.
+
+Confirm G0 only for missing or consequential choices:
+
+- audience and publication context;
+- article type;
+- target length and deadline;
+- desired output stage;
+- tone, language, and whether a writing sample should guide voice;
+- interview access and research constraints.
+
+### 2. Propose story models before deep research
+
+Map the initial dynamic:
+
+```text
+development → impact → reaction
+```
+
+Generate 2–3 candidate story models, each with:
+
+- central development;
+- maturity stage;
+- most important impact;
+- human center;
+- conflict;
+- likely evidence;
+- scope boundary;
+- what would disprove it.
+
+Ask G1 with a recommendation. After the user chooses the maturity and center, write a provisional hypothesis.
+
+Use these provisional forms:
 
 ```text
 Emerging story:
-[Development] is beginning to change [specific people/system] by [direct impact].
+[Development] is beginning to change [specific people/system] through [direct impact].
 
 Mature story:
 [Known development] is producing [underreported impact], causing [affected actors]
 to [reaction], while [opposing actor/constraint] pushes the other way.
 
 Profile:
-[Person] is best understood through [2–3 traits], visible in [actions and conflicts].
+[Person or group] is best understood through [2–3 traits or tensions],
+visible in [actions, decisions, and conflicts].
 ```
 
-Reject hypotheses that are merely topics, moral judgments, trend slogans, or conclusions that cannot be tested.
+Read [references/story-hypothesis.md](references/story-hypothesis.md) when the angle is broad or several stories compete.
 
-Read [references/story-hypothesis.md](references/story-hypothesis.md) when the angle is unclear, the topic is too broad, or multiple plausible stories compete.
+### 3. Confirm the working story hypothesis
 
-## 3. Run deep research as gap-closing, not link collection
+Write:
 
-Create a research question tree using six evidence boxes:
+- one recommended hypothesis;
+- one narrower version;
+- one broader or competing version;
+- explicit in-scope and out-of-scope boundaries;
+- the central claims that must be proved;
+- likely scenes, characters, records, data, and counterevidence.
+
+Ask G2. Once approved, record the decision as `DEC-###` and link it from the project index and relevant claim/section records.
+
+### 4. Run deep research as gap-closing
+
+Use six evidence boxes:
 
 ```text
 history | scope | causes | impacts | reactions | future
 ```
 
-For each major claim, seek complementary evidence:
-
-- **documents/data** for verifiable facts and scale;
-- **direct participants** for action, experience, scene, and consequence;
-- **independent sources** for explanation, challenge, and corroboration.
-
 Research in passes:
 
-1. **Landscape pass** — map terminology, timeline, actors, institutions, known disputes, and primary sources.
-2. **Hypothesis pass** — test the proposed development, impact, reaction, and conflict.
-3. **Contradiction pass** — actively search for counterexamples, failed cases, opposing incentives, disputed definitions, and better explanations.
-4. **Gap pass** — fill only the evidence holes that would block the article.
-5. **Stop decision** — stop when additional research mostly repeats existing evidence and the remaining uncertainty is clearly disclosed.
+1. landscape pass;
+2. hypothesis pass;
+3. contradiction pass;
+4. gap pass;
+5. stop decision.
 
-Record every usable item with:
+For every major claim, seek complementary roles:
 
-- source title, author/organization, date, URL or file path;
-- source type and role;
-- exact claim supported;
-- quotation or data excerpt kept within copyright limits;
-- reliability notes, conflicts of interest, caveats, and access date;
-- intended article section.
+```text
+document/data
++ direct participant
++ independent corroboration
++ counterevidence
+```
 
-Do not claim to have interviewed anyone unless an actual interview transcript or notes are provided.
+Create OKF records while researching:
 
-Read [references/research-workflow.md](references/research-workflow.md) before substantial web research or when evidence is fragmented.
+- one `SRC-###.md` per source;
+- one `CLM-###.md` per consequential claim;
+- one `MAT-###.md` per reusable fact, quote, scene, number, document finding, or contradiction.
 
-## 4. Revise the hypothesis after reporting
+A material item belongs to one or more evidence boxes and one or more section candidates. Never store a quote without source and locator.
 
-After the first research pass, rewrite the story hypothesis from evidence.
+Read [references/research-workflow.md](references/research-workflow.md) for query design, interview planning, evidence matrices, and stop rules.
 
-Test it:
+### 5. Turn materials into an article directory
 
-- Does it name a real change rather than a subject?
-- Does it identify concrete people or institutions affected?
-- Is there observable action or reaction?
-- Can each major clause be verified?
-- Does it define what is out of scope?
-- Does it point toward scenes, sources, data, and a plausible ending?
-- Would disconfirming evidence change it?
+Do not jump from notes to prose.
 
-If not, narrow, split, or abandon it. Do not force facts into the original angle.
+Create `article-blueprint.md` and one `SEC-###.md` card per planned section. Every section card must state:
 
-## 5. Choose one controlling structure
+```text
+title
+job
+reader question answered
+primary claim
+evidence boxes used
+material IDs
+human/action element
+counterpoint
+expansion pattern
+entry move
+exit/transition
+excluded material
+verification gaps
+approval status
+```
 
-Use one dominant narrative line:
+Select one dominant line:
 
-- **Logical progression** — history → scope → causes → impacts → reactions → future.
-- **Chronology** — a day, journey, case, investigation, or historical sequence.
-- **Thematic profile** — 2–3 traits or tensions demonstrated through actions.
+- logical progression;
+- chronology;
+- thematic profile;
+- explicitly controlled hybrid.
 
-Other lines may appear locally, but readers should always know why the article moves next.
+Then ask G3 with the proposed directory. The user should be able to see what every part does and what would be lost if it were removed.
 
-For a standard feature, plan:
+Read [references/article-architecture.md](references/article-architecture.md) when choosing the whole-article line.
+
+### 6. Select how each section expands
+
+Choose one primary expansion pattern for each major section:
+
+- mechanism;
+- scale;
+- impact;
+- character reveal;
+- conflict braid;
+- complication/counterevidence;
+- reaction;
+- historical backfill;
+- future conditional.
+
+Add the selected pattern to each section card and show the user the sequence in compact form, for example:
+
+```text
+SEC-003 Impact:
+aggregate change → participant scene → cost/consequence → mechanism → response
+```
+
+Ask G4. The user may accept all recommended patterns or override specific sections.
+
+Read [references/section-expansion-patterns.md](references/section-expansion-patterns.md) for the tool cards.
+
+### 7. Draft by section function
+
+Draft only after G3 and G4 are approved.
+
+A standard feature often moves:
 
 ```text
 lead
 → nut graf / theme paragraph
-→ body section 1
-→ body section 2
+→ mechanism
+→ concrete impact
 → complication or counterevidence
 → reaction / next movement
 → ending
 ```
 
-Each body section should usually perform this movement:
+Each paragraph or section must perform a named job. Use source, claim, material, and section IDs in drafting notes or comments when useful, then remove internal annotations from publication copy.
 
-```text
-claim or development
-→ evidence/data
-→ person/action/scene
-→ mechanism or explanation
-→ complication, limit, or counterpoint
-→ concrete transition
-```
+For individual components, use [references/section-craft.md](references/section-craft.md).
 
-Read [references/article-architecture.md](references/article-architecture.md) when selecting the overall form or arranging a long article.
+### 8. Apply language tools deliberately
 
-## 6. Draft article components by function
+Do not apply every technique everywhere. Select tools because the material needs them.
 
-### Lead
+Before drafting a key passage, choose from [references/style-toolkit.md](references/style-toolkit.md), including:
 
-Choose the form that best serves the story:
+- concrete noun + active verb;
+- freight-train sentence;
+- hook-on clause;
+- parallel structure;
+- controlled repetition;
+- keyword placement;
+- short-force sentence;
+- long/short rhythm variation;
+- action motion;
+- macro/micro alternation;
+- contrast braid;
+- controlled digression and return;
+- data humanization;
+- quote punch;
+- transition by actual movement;
+- echo, forward-motion, or widening-frame ending.
 
-- hard-news lead for urgent, consequential events;
-- summary lead for a complex central change;
-- anecdotal lead for a short, true, representative scene;
-- quotation lead only for genuinely distinctive language;
-- descriptive lead when the environment itself carries the theme.
+Each tool card defines when to use it, its input, operation, output shape, and failure modes.
 
-An anecdotal lead must be concise, true, representative, intrinsically interesting, and tightly connected to the article's focus.
+### 9. Calibrate voice and remove AI writing patterns
 
-Do not stall on the lead. When needed, draft the body first and return to the opening.
+At G5, ask whether to use:
 
-### Nut graf / theme paragraph
+- the user's writing sample;
+- a named publication or authorial register;
+- neutral reported prose;
+- a light, medium, or strong anti-AI cleanup pass.
 
-Soon after the lead, answer:
+When a user sample is available, derive a compact voice profile:
 
-- What is happening?
-- Why does it matter now?
-- Who is affected?
-- What will the article reveal or test?
+- sentence-length distribution;
+- preferred vocabulary level;
+- paragraph openings;
+- punctuation;
+- degree of explicit signposting;
+- humor, skepticism, and first-person use;
+- transition habits;
+- tolerated roughness or asymmetry.
 
-Convert the internal story hypothesis into a reader-facing promise without giving away every conclusion.
+Then run the human-writing pass described in [references/human-writing-integration.md](references/human-writing-integration.md).
 
-### Data
+This repository references the MIT-licensed open-source `blader/humanizer` skill. If it is installed, invoke it after factual and structural revision. If it is not installed, use the compact adapted checklist in the integration reference.
 
-Keep only numbers that change the reader's understanding of scale, direction, comparison, or risk.
+Never make prose "more human" by inventing opinions, uncertainty, anecdotes, or personality not supported by the author or reporting.
 
-Prefer:
+### 10. Verify before polishing
 
-- a small number of decisive figures;
-- ratios, rates, per-person values, change over time, and understandable comparisons;
-- necessary definitions, time windows, and uncertainty.
+Maintain `fact-check-ledger.csv`.
 
-Do not manufacture vivid comparisons or sacrifice accuracy for simplicity.
-
-### Characters and quotations
-
-Interview broadly; feature selectively.
-
-Use direct quotations when the original wording adds:
-
-- authority;
-- emotion;
-- distinctive voice;
-- a decisive turn in the evidence.
-
-Paraphrase routine facts and long explanations. Never invent, merge, clean up, or dramatize a quotation beyond what the source supports.
-
-### Scenes and description
-
-Include only observed or documented details that provide evidence, reveal character, establish a necessary environment, or create meaningful contrast.
-
-Never invent sensory detail, internal thought, chronology, or dialogue.
-
-### Transitions
-
-Make the next section grow from a concrete change in time, place, actor, cause, consequence, or reaction. Avoid empty transitions such as "another aspect of the issue."
-
-### Ending
-
-Choose among:
-
-- **echo** — return to the opening image, person, action, or phrase with deeper meaning;
-- **forward movement** — show the next evidenced action, risk, or decision;
-- **widening frame** — connect the specific story to a larger significance already earned by the article.
-
-Do not hide essential facts at the end or introduce a new unsupported thesis.
-
-Read [references/section-craft.md](references/section-craft.md) when drafting or revising individual parts.
-
-## 7. Verify before polishing
-
-Create or update `fact-check-ledger.csv`.
-
-For every consequential factual statement, record:
-
-- exact claim;
-- source(s);
-- source type;
-- verification status;
-- uncertainty or dispute;
-- article location;
-- required correction or follow-up.
-
-Distinguish clearly among:
+For every consequential statement, distinguish:
 
 - verified fact;
 - source allegation;
 - expert interpretation;
 - author inference;
 - estimate;
-- projection.
+- projection;
+- quotation;
+- scene detail;
+- reconstructed chronology.
 
-Check names, titles, dates, chronology, numbers, denominators, definitions, quotations, links, and whether a source has a relevant conflict of interest.
+Check names, titles, dates, numbers, denominators, definitions, chronology, quotation fidelity, conflicts of interest, and current facts.
 
-For current or unstable facts, search again immediately before finalizing.
+Read [references/verification-and-revision.md](references/verification-and-revision.md).
 
-Read [references/verification-and-revision.md](references/verification-and-revision.md) before calling a draft final.
+### 11. Revise in three passes
 
-## 8. Revise in three passes
-
-### Pass 1 — substance
-
-Check the story hypothesis, scope, missing reporting, evidence diversity, counterevidence, fairness, and factual support. Delete beautiful but irrelevant material.
-
-### Pass 2 — structure and logic
-
-Check the controlling line, section order, nut graf, causal leaps, repetitions, transitions, and whether the ending completes the article.
-
-### Pass 3 — prose and rhythm
-
-Replace abstractions with exact nouns and active verbs. Tighten quotations, vary sentence length, remove throat-clearing, and clarify attribution.
+1. **Substance:** hypothesis, scope, missing reporting, evidence diversity, counterevidence, fairness.
+2. **Structure:** controlling line, section order, causal leaps, repetition, transitions, ending.
+3. **Prose:** exact nouns, active verbs, quotation trimming, sentence rhythm, attribution, AI-pattern cleanup.
 
 Run:
 
 ```bash
-python scripts/audit_article.py draft.md
+python scripts/audit_article.py drafts/draft.md
+python scripts/validate_story_project.py .
 ```
 
-Treat the output as editorial prompts, not mechanical truth.
+Treat script output as editorial prompts, not mechanical truth.
 
-## 9. Deliver an editorially honest result
+### 12. Final human sign-off
 
-When evidence is incomplete:
+Before calling a piece final, produce:
 
-- state what is missing;
-- identify which claims remain provisional;
-- provide the next research or interview actions;
-- do not fill gaps with plausible invention.
+- sourcing note;
+- unresolved verification items;
+- fairness/nonresponse log;
+- material excluded as unsupported, off-scope, repetitive, or weak;
+- remaining claims dependent on a single source;
+- the final article directory and section IDs.
 
-For a final delivery, include:
-
-1. the article or requested artifact;
-2. a concise sourcing note;
-3. unresolved verification items;
-4. material excluded because it was unsupported, off-scope, or repetitive.
+Ask G6. Do not conceal unresolved issues.
 
 ## Reference routing
 
-- Deep research, source strategy, query design, evidence matrix, stop rules:
+- Human decision gates and `AskUserQuestion` patterns:
+  [references/human-checkpoints.md](references/human-checkpoints.md)
+- OKF project structure, IDs, metadata, and relationships:
+  [references/okf-material-system.md](references/okf-material-system.md)
+- Deep research and evidence acquisition:
   [references/research-workflow.md](references/research-workflow.md)
-- Theme hypothesis, scope, maturity, conflict, angle selection:
+- Story maturity, hypothesis, conflict, and scope:
   [references/story-hypothesis.md](references/story-hypothesis.md)
-- Whole-article structure and story modes:
+- Whole-article architecture and section directory:
   [references/article-architecture.md](references/article-architecture.md)
+- Section expansion tool cards:
+  [references/section-expansion-patterns.md](references/section-expansion-patterns.md)
 - Leads, nut grafs, data, quotes, scenes, transitions, endings:
   [references/section-craft.md](references/section-craft.md)
-- Fact-checking, fairness, revision, and final review:
+- Sentence, rhythm, motion, contrast, and ending tools:
+  [references/style-toolkit.md](references/style-toolkit.md)
+- Human voice and anti-AI editing:
+  [references/human-writing-integration.md](references/human-writing-integration.md)
+- Fact-checking, fairness, and revision:
   [references/verification-and-revision.md](references/verification-and-revision.md)
