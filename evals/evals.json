@@ -1,0 +1,23 @@
+{
+  "skill_name": "journal-article-writing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I want to write a 2,500-word reported feature on how default AI meeting transcription is changing what employees say at work. Build the deep-research plan, a provisional story hypothesis, an evidence matrix, and an article outline. Do not draft the article yet.",
+      "expected_output": "A scoped development-impact-reaction hypothesis; six-box research plan; source-role map; contradiction search plan; evidence matrix; missing-evidence list; and a functional lead/nut-graf/body/ending outline.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I have notes from 12 interviews, a policy PDF, survey results, and three scenes, but my story about return-to-office rules feels like a generic trend piece. Show me how to narrow the angle, decide which material belongs in each section, and identify what reporting is still missing.",
+      "expected_output": "Competing hypotheses, a chosen scope boundary, material classification, section cards, counterevidence and fairness gaps, and a targeted follow-up reporting list.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Review my long-form article draft as a demanding feature editor. Check the lead, nut graf, evidence, causal claims, characters, data, transitions, ending, fairness, and fact-check readiness. Give me a three-pass revision plan rather than merely rewriting sentences.",
+      "expected_output": "A substance-first editorial diagnosis, structural revision map, prose pass, fact-check risks, unresolved claims, and prioritized next actions.",
+      "files": []
+    }
+  ]
+}
